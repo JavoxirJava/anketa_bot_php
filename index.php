@@ -124,7 +124,7 @@ function sendMail($chat_id, $fName, $phone, $appeal) {
 
         // Qabul qiluvchini sozlash
         $mail->setFrom('javoxir8177@gmail.com', 'Appeal'); // Yuboruvchi email va ismi
-        $mail->addAddress('javoxir8177@gmail.com', 'Recipient Name'); // Qabul qiluvchi email va ismi //TODO anticor.uzavtoyulbelgi@mail.ru
+        $mail->addAddress('javoxir8177@gmail.com', 'Car road sign'); // Qabul qiluvchi email va ismi //TODO anticor.uzavtoyulbelgi@mail.ru
 
         // Kontent
         $mail->isHTML();
