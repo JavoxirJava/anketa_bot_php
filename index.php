@@ -4,12 +4,23 @@ require 'vendor/autoload.php';
 use Telegram\Bot\Api;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
+use Telegram\Bot\Exceptions\TelegramSDKException;
 
-$telegram = new Api('5169354010:AAFlFQCD4lk29l9FXfKYb7nTzZnbsfOohy0');
+$telegram = new Api('7383627105:AAFrktVAWW7g6tIiNwxd8pi8xsGLMPR_8ZQ'); // @full_testbot
+
+static $count = 1;
+
+//Colors
+$red = "\033[31m";
+$green = "\033[32m";
+$blue = "\033[34m";
+$yellow = "\033[33m";
+$reset = "\033[0m"; // Ranglarni tiklash
 
 $lastUpdateId = 0;
 $choose = array();
 $fName = array();
+$phone = array();
 $chooseLang = array();
 $messageDeleted = false;
 
@@ -27,6 +38,8 @@ while (true) {
             if (isset($update['message'])) {
                 $chat_id = $update['message']['chat']['id'];
                 $text = $update['message']['text'];
+                if (!isset($choose[$chat_id])) $choose[$chat_id] = null;
+                if (!isset($chooseLang[$chat_id])) $chooseLang[$chat_id] = 'uz';
                 switch ($text) {
                     case '/start':
                         sendMSG($content['hello'], $chat_id, null);
@@ -34,9 +47,11 @@ while (true) {
                         $choose[$chat_id] = 'fName';
                         break;
                     case $content[$chooseLang[$chat_id]]['about']:
-                            sendMSG($content[$chooseLang[$chat_id]]['about us'], $chat_id, null);
+                        sendMSG($content[$chooseLang[$chat_id]]['about us'], $chat_id, null);
+                        console($chat_id, 'about');
                         break;
                     default:
+                        console($chat_id, $text);
                         switch ($choose[$chat_id]) {
                             case 'fName':
                                 $fName[$chat_id] = $text;
@@ -44,11 +59,13 @@ while (true) {
                                 sendMSG($content[$chooseLang[$chat_id]]['phone'], $chat_id, null);
                                 break;
                             case 'phone':
+                                $phone[$chat_id] = $text;
                                 $choose[$chat_id] = 'appeal';
                                 sendMSG($content[$chooseLang[$chat_id]]['appeal'], $chat_id, null);
                                 break;
                             case 'appeal':
                                 sendMSG($content[$chooseLang[$chat_id]]['end'], $chat_id, null);
+                                sendMail($chat_id, $fName[$chat_id], $phone[$chat_id], $text);
                                 break;
                         }
                 }
@@ -93,31 +110,40 @@ function deleteMSG($chat_id, $message_id) {
     ]);
 }
 
-function sendMail($text) {
+function sendMail($chat_id, $fName, $phone, $appeal) {
     $mail = new PHPMailer(true);
     try {
         // Server sozlamalari
         $mail->isSMTP();
-        $mail->Host       = 'localhost';  // SMTP serveringizni qo'shing
+        $mail->Host       = 'smtp.gmail.com';  // SMTP serveringizni qo'shing
         $mail->SMTPAuth   = true;
         $mail->Username   = 'javoxir8177@gmail.com'; // SMTP email
-        $mail->Password   = 'your-password';          // SMTP email parol
+        $mail->Password   = 'mvrnlioxqiplosfd';          // SMTP email parol: mvrn liox qipl osfd
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port       = 587;
 
         // Qabul qiluvchini sozlash
-        $mail->setFrom('your-email@example.com', 'Telegram Bot');
-        $mail->addAddress('recipient@example.com', 'Recipient Name');
+        $mail->setFrom('javoxir8177@gmail.com', 'Appeal'); // Yuboruvchi email va ismi
+        $mail->addAddress('javoxir8177@gmail.com', 'Recipient Name'); // Qabul qiluvchi email va ismi //TODO anticor.uzavtoyulbelgi@mail.ru
 
         // Kontent
         $mail->isHTML();
-        $mail->Subject = 'Telegram Bot Ma\'lumotlari';
-        $mail->Body    = 'Sizning botingizdan olingan ma\'lumot: ' . $text;
+        $mail->Subject = 'Telegram Bot - Appeal';
+        $mail->Body    = "<h1>Telegram Bot - Appeal</h1>
+            <h2><b>Full Name: </b>{$fName}</h2>
+            <h2><b>Phone: </b><a href='tel:{$phone}'>{$phone}</a></h2>
+            <h2><b>Appeal: </b>{$appeal}</h2>";
 
         // Emailni jo'natish
         $mail->send();
-        echo 'Email muvaffaqiyatli jo\'natildi';
+        console($chat_id, 'The information has been sent to email successfully');
     } catch (Exception $e) {
         echo "Emailni jo'natishda xatolik: {$mail->ErrorInfo}";
     }
+}
+
+function console($chat_id, $text) {
+    global $green, $yellow , $blue, $reset, $choose, $count;
+    echo $yellow . "{$count} -> " . $blue . "Id: {$chat_id}, {$green}Status {$choose[$chat_id]}: {$text}\n" . $reset;
+    $count++;
 }
