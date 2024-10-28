@@ -4,7 +4,6 @@ require 'vendor/autoload.php';
 use Telegram\Bot\Api;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
-use Telegram\Bot\Exceptions\TelegramSDKException;
 
 $telegram = new Api('7383627105:AAFrktVAWW7g6tIiNwxd8pi8xsGLMPR_8ZQ'); // @full_testbot
 
@@ -144,6 +143,6 @@ function sendMail($chat_id, $fName, $phone, $appeal) {
 
 function console($chat_id, $text) {
     global $green, $yellow , $blue, $reset, $choose, $count;
-    echo $yellow . "{$count} -> " . $blue . "Id: {$chat_id}, {$green}Status {$choose[$chat_id]}: {$text}\n" . $reset;
+    echo $yellow . "$count -> " . $blue . "Id: $chat_id, {$green}Status $choose[$chat_id]: $text\n" . $reset;
     $count++;
 }
