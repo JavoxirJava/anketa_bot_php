@@ -116,8 +116,8 @@ function sendMail($chat_id, $fName, $phone, $appeal) {
         $mail->isSMTP();
         $mail->Host       = 'smtp.gmail.com';  // SMTP serveringizni qo'shing
         $mail->SMTPAuth   = true;
-        $mail->Username   = 'javoxir8177@gmail.com'; // SMTP email
-        $mail->Password   = 'mvrnlioxqiplosfd';          // SMTP email parol: mvrn liox qipl osfd
+        $mail->Username   = '@gmail.com'; // SMTP email
+        $mail->Password   = 'appPassword';          // SMTP email parol: 
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port       = 587;
 
